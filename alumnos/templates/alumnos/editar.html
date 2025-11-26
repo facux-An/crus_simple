@@ -1,38 +1,73 @@
 {% extends "base.html" %}
 
+{% block title %}Editar Alumno · CRUD Alumnos{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2 class="mb-4">Editar Alumno: {{ alumno.nombre }}</h2>
+<style>
+  .editar-hero {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,.15);
+  }
+  .editar-card {
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 12px 28px rgba(0,0,0,.12);
+  }
+  .form-label { font-weight: 600; }
+</style>
 
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <form method="post" novalidate>
-        {% csrf_token %}
-        
-        {% if form.non_field_errors %}
-          <div class="alert alert-danger">
-            {{ form.non_field_errors }}
-          </div>
-        {% endif %}
+<div class="container py-4">
 
-        {% for field in form %}
-          <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="text-danger small">
-                {{ field.errors|striptags }}
+  <!-- Hero superior -->
+  <div class="editar-hero p-4 p-md-5 mb-4 text-center">
+    <h1 class="h3 mb-2"><i class="bi bi-pencil-square me-2"></i>Editar alumno</h1>
+    <p class="mb-0 opacity-75">Modificá los datos de <strong>{{ alumno.nombre }}</strong> y guardá los cambios.</p>
+  </div>
+
+  <!-- Tarjeta de edición -->
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+      <div class="card editar-card">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-4 text-center">Formulario de edición</h2>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {{ form.non_field_errors }}
               </div>
             {% endif %}
-          </div>
-        {% endfor %}
 
-        <div class="mt-3 d-flex justify-content-between">
-          <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
-          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            {% for field in form %}
+              <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">
+                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ field.errors|striptags }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+              <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-icon">
+                <i class="bi bi-x-circle-fill me-1"></i>Cancelar
+              </a>
+              <button type="submit" class="btn btn-primary btn-icon">
+                <i class="bi bi-check-circle-fill me-1"></i>Guardar cambios
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
+
 </div>
 {% endblock %}
