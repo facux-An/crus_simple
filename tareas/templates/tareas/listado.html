@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Listado de tareas</h2>
+  <a href="{% url 'crear' %}" class="btn btn-primary mb-3">Nueva tarea</a>
+
+  {% if tareas %}
+    <table class="table table-striped">
+      <tr><th>Título</th><th>Descripción</th><th>Acciones</th></tr>
+      {% for tarea in tareas %}
+      <tr>
+        <td>{{ tarea.titulo }}</td>
+        <td>{{ tarea.descripcion }}</td>
+        <td>
+          <a href="{% url 'editar' tarea.id %}" class="btn btn-sm btn-warning">Editar</a>
+          <a href="{% url 'borrar' tarea.id %}" class="btn btn-sm btn-danger">Borrar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <div class="alert alert-info">No hay tareas creadas aún.</div>
+  {% endif %}
+</div>
+{% endblock %}
