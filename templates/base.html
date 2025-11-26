@@ -3,31 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}CRUD Alumnos{% endblock %}</title>
+
+  <!-- Tipografía y estilos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap y Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --brand-1:#0d6efd;
+      --brand-2:#6610f2;
+      --text:#1f1f1f;
+      --muted:#6c757d;
+      --surface:#ffffff;
+    }
+    html, body { height: 100%; }
+    body{
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(135deg, rgba(13,110,253,.08), rgba(102,16,242,.10));
+      color: var(--text);
+    }
+
+    /* Navbar */
+    .navbar {
+      box-shadow: 0 10px 20px rgba(0,0,0,.12);
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+    }
+    .navbar-brand { font-weight: 700; letter-spacing: .2px; }
+    .nav-link {
+      color: #f8f9fa !important;
+      opacity: .9;
+    }
+    .nav-link:hover { opacity: 1; }
+
+    /* Contenedor principal */
+    .page-container { padding-bottom: 3rem; }
+
+    /* Mensajes */
+    .messages-container { max-width: 980px; }
+    .alert {
+      border: 0;
+      border-radius: .75rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
+    }
+
+    /* Cards y secciones */
+    .section-card{
+      background: var(--surface);
+      border: 0;
+      border-radius: 1rem;
+      box-shadow: 0 12px 28px rgba(0,0,0,.10);
+    }
+
+    /* Footer */
+    footer {
+      color: var(--muted);
+    }
+  </style>
 </head>
 <body>
+
   <!-- Navbar común -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'dashboard' %}">CRUD Alumnos</a>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'dashboard' %}">
+        <i class="bi bi-mortarboard-fill me-2"></i>CRUD Alumnos
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'contacto' %}">Contacto</a>
+            <a class="nav-link" href="{% url 'dashboard' %}">
+              <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'crear_alumno' %}">
+              <i class="bi bi-person-plus-fill me-1"></i>Crear alumno
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'contacto' %}">
+              <i class="bi bi-envelope-fill me-1"></i>Contacto
+            </a>
           </li>
           {% if user.is_authenticated %}
-          <li class="nav-item">
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+          <li class="nav-item ms-lg-2">
+            <form action="{% url 'logout' %}" method="post" class="d-inline">
               {% csrf_token %}
-              <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
+              <button type="submit" class="btn btn-light btn-sm">
+                <i class="bi bi-lock-fill me-1"></i>Cerrar sesión
+              </button>
             </form>
           </li>
           {% else %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Registro</a></li>
+          <li class="nav-item ms-lg-2">
+            <a class="btn btn-outline-light btn-sm me-2" href="{% url 'login' %}">
+              <i class="bi bi-door-open-fill me-1"></i>Login
+            </a>
+            <a class="btn btn-light btn-sm" href="{% url 'register' %}">
+              <i class="bi bi-person-plus-fill me-1"></i>Registro
+            </a>
+          </li>
           {% endif %}
         </ul>
       </div>
@@ -35,10 +118,17 @@
   </nav>
 
   <!-- Bloque de mensajes -->
-  <div class="container mt-3">
+  <div class="container messages-container mt-3">
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          <span class="me-1">
+            {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+            {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill"></i>
+            {% elif message.tags == 'danger' %}<i class="bi bi-x-circle-fill"></i>
+            {% else %}<i class="bi bi-info-circle-fill"></i>
+            {% endif %}
+          </span>
           {{ message }}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
@@ -47,9 +137,19 @@
   </div>
 
   <!-- Contenido dinámico -->
-  <div class="container mt-4">
-    {% block content %}{% endblock %}
+  <div class="container page-container mt-4">
+    <div class="section-card p-3 p-md-4">
+      {% block content %}{% endblock %}
+    </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="container text-center py-4">
+    <small>
+      <i class="bi bi-code-slash me-1"></i>
+      Proyecto CRUD Alumnos · {{ user.username|default:"Invitado" }}
+    </small>
+  </footer>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

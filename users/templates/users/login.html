@@ -1,32 +1,66 @@
 {% extends "base.html" %}
 
+{% block title %}Login · CRUD Alumnos{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2 class="mb-4">Login</h2>
+<style>
+  .login-hero {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,.15);
+  }
+  .login-card {
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 12px 28px rgba(0,0,0,.12);
+  }
+  .form-label { font-weight: 600; }
+</style>
 
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <form method="post" novalidate>
-        {% csrf_token %}
-        
-        {% for field in form %}
-          <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="text-danger small">
-                {{ field.errors|striptags }}
+<div class="container py-4">
+
+  <!-- Hero superior -->
+  <div class="login-hero p-4 p-md-5 mb-4 text-center">
+    <h1 class="h3 mb-2"><i class="bi bi-door-open-fill me-2"></i>Ingreso al sistema</h1>
+    <p class="mb-0 opacity-75">Accedé a tu panel de alumnos con tu usuario y contraseña.</p>
+  </div>
+
+  <!-- Tarjeta de login -->
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card login-card">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-4 text-center">Login</h2>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+              <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">
+                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ field.errors|striptags }}
+                  </div>
+                {% endif %}
               </div>
-            {% endif %}
-          </div>
-        {% endfor %}
+            {% endfor %}
 
-        <div class="mt-3 d-flex justify-content-between">
-          <button type="submit" class="btn btn-primary">Ingresar</button>
-          <a href="{% url 'register' %}" class="btn btn-link">Registrarse</a>
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+              <button type="submit" class="btn btn-primary btn-icon">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
+              </button>
+              <a href="{% url 'register' %}" class="btn btn-link">
+                <i class="bi bi-person-plus-fill me-1"></i>Registrarse
+              </a>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
+
 </div>
 {% endblock %}
