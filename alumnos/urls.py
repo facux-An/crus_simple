@@ -1,21 +1,11 @@
 from django.urls import path
-from .views import (
-    dashboard,
-    crear_alumno,
-    editar_alumno,
-    borrar_alumno,
-    enviar_pdf_alumno,
-)
+from . import views
 
 urlpatterns = [
-    # Página principal del dashboard de alumnos
-    path("", dashboard, name="dashboard"),
-
-    # CRUD de alumnos
-    path("crear/", crear_alumno, name="crear_alumno"),
-    path("<int:alumno_id>/editar/", editar_alumno, name="editar_alumno"),
-    path("<int:alumno_id>/borrar/", borrar_alumno, name="borrar_alumno"),
-
-    # Generación y envío de PDF por correo
-    path("pdf/<int:alumno_id>/", enviar_pdf_alumno, name="enviar_pdf_alumno"),
+    path("", views.dashboard, name="dashboard"),
+    path("crear/", views.crear_alumno, name="crear_alumno"),
+    path("editar/<int:alumno_id>/", views.editar_alumno, name="editar_alumno"),
+    path("borrar/<int:alumno_id>/", views.borrar_alumno, name="borrar_alumno"),
+    path("enviar-pdf/<int:alumno_id>/", views.enviar_pdf_alumno, name="enviar_pdf_alumno"),
+    path("descargar-pdf/<int:alumno_id>/", views.descargar_pdf_alumno, name="descargar_pdf_alumno"),
 ]

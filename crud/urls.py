@@ -7,4 +7,6 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("scraper/", include("scraper.urls")),
     path("contacto/", include("contacto.urls")),
+    path("informes/", include(("informes.urls", "informes"), namespace="informes")),
+
 ]

@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "alumnos",
     "scraper",
     "contacto",
+    "informes",
 ]
 
 MIDDLEWARE = [

@@ -59,7 +59,7 @@ def borrar_alumno(request, alumno_id):
 def enviar_pdf_alumno(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id, usuario=request.user)
 
-    # Generar PDF en memoria
+    # Generar PDF en memoria (para enviar por email)
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     p.setFont("Helvetica", 12)
@@ -86,3 +86,30 @@ def enviar_pdf_alumno(request, alumno_id):
 
     messages.success(request, f"Se envió el PDF de {alumno.nombre} por correo ✅")
     return redirect("dashboard")
+
+
+@login_required
+def descargar_pdf_alumno(request, alumno_id):
+    """
+    Genera y devuelve el PDF del alumno como descarga (attachment).
+    """
+    alumno = get_object_or_404(Alumno, id=alumno_id, usuario=request.user)
+
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    p.setFont("Helvetica", 12)
+    p.drawString(100, 800, "Datos del Alumno")
+    p.drawString(100, 770, f"Nombre: {alumno.nombre}")
+    p.drawString(100, 750, f"Email: {alumno.email}")
+    p.drawString(100, 730, f"Carrera: {alumno.carrera}")
+    p.drawString(100, 710, f"Creado: {alumno.creado.strftime('%d/%m/%Y %H:%M')}")
+    p.showPage()
+    p.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+
+    from django.http import HttpResponse
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="alumno_{alumno.id}.pdf"'
+    return response
