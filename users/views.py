@@ -42,12 +42,8 @@ def register(request):
             message = f"Hola {user.username}, tu registro fue exitoso. ¡Bienvenido!"
             from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
 
-            try:#
-                import logging
-                logger = logging.getLogger(__name__)
-
-                logger.info("EMAIL_BACKEND=%s EMAIL_HOST=%s", getattr(settings, "EMAIL_BACKEND", None), getattr(settings, "EMAIL_HOST", None))
-                #
+            try:
+                
                 send_mail(
                     subject=subject,
                     message=message,
