@@ -67,7 +67,8 @@ def enviar_pdf_alumno(request, alumno_id):
     p.drawString(100, 770, f"Nombre: {alumno.nombre}")
     p.drawString(100, 750, f"Email: {alumno.email}")
     p.drawString(100, 730, f"Carrera: {alumno.carrera}")
-    p.drawString(100, 710, f"Creado: {alumno.creado.strftime('%d/%m/%Y %H:%M')}")
+    p.drawString(100, 710, f"Calificación: {alumno.calificacion if alumno.calificacion is not None else 'Sin asignar'}")
+    p.drawString(100, 690, f"Creado: {alumno.creado.strftime('%d/%m/%Y %H:%M')}")
     p.showPage()
     p.save()
 
@@ -88,6 +89,7 @@ def enviar_pdf_alumno(request, alumno_id):
     return redirect("dashboard")
 
 
+
 @login_required
 def descargar_pdf_alumno(request, alumno_id):
     """
@@ -102,7 +104,8 @@ def descargar_pdf_alumno(request, alumno_id):
     p.drawString(100, 770, f"Nombre: {alumno.nombre}")
     p.drawString(100, 750, f"Email: {alumno.email}")
     p.drawString(100, 730, f"Carrera: {alumno.carrera}")
-    p.drawString(100, 710, f"Creado: {alumno.creado.strftime('%d/%m/%Y %H:%M')}")
+    p.drawString(100, 710, f"Calificación: {alumno.calificacion if alumno.calificacion is not None else 'Sin asignar'}")
+    p.drawString(100, 690, f"Creado: {alumno.creado.strftime('%d/%m/%Y %H:%M')}")
     p.showPage()
     p.save()
 
