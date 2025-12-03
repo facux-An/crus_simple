@@ -59,6 +59,21 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.10);
     }
 
+    /* Hero principal */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .hero h1 {
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
     /* Footer */
     footer {
       color: var(--muted);
@@ -141,6 +156,15 @@
         </div>
       {% endfor %}
     {% endif %}
+  </div>
+
+  <!-- Hero principal con botón destacado -->
+  <div class="container hero">
+    <h1>Bienvenido a CRUD Alumnos</h1>
+    <p>Gestioná alumnos, usuarios y explorá nuevas funciones como el módulo de Scraper.</p>
+    <a href="{% url 'scraper_home' %}" class="btn btn-lg btn-primary shadow-sm">
+      🔍 Ir al Scraper
+    </a>
   </div>
 
   <!-- Contenido dinámico -->
