@@ -1,8 +1,74 @@
 {% extends "base.html" %}
 
+{% block title %}Scraper · CRUD Alumnos{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-  <h2>Scraper</h2>
-  <p>Esta es la página de scraping (todavía en construcción).</p>
+  <h2 class="mb-3">🔍 Scraper</h2>
+  <p class="text-muted">Elegí la fuente y buscá un término.</p>
+
+  <!-- Formulario de búsqueda con selector de fuente -->
+  <form method="get" action="{% url 'buscar' %}" class="mb-4">
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input type="text" name="q" class="form-control" placeholder="Ejemplo: Agua, Arroz, Cerveza..." value="{{ query }}" required>
+      </div>
+      <div class="col-md-4">
+        <select name="source" class="form-select">
+          <option value="wikipedia" {% if source == "wikipedia" %}selected{% endif %}>Wikipedia</option>
+          <option value="coto" {% if source == "coto" %}selected{% endif %}>Coto Digital</option>
+          <option value="local" {% if source == "local" %}selected{% endif %}>HTML Local</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100" type="submit">
+          <i class="bi bi-search me-1"></i>Buscar
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Resultados -->
+  {% if query %}
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% for r in resultados %}
+      <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ r.titulo }}</h5>
+
+          <!-- Mostrar precio y marca si existen -->
+          {% if r.precio or r.marca %}
+            <p class="card-text">
+              {% if r.precio %}
+                <strong>Precio:</strong> ${{ r.precio }}<br>
+              {% endif %}
+              {% if r.marca %}
+                <strong>Marca:</strong> {{ r.marca }}<br>
+              {% endif %}
+            </p>
+          {% endif %}
+
+          <!-- Mostrar snippets si vienen de otra fuente -->
+          {% if r.snippets %}
+            <p class="card-text">
+              {% for s in r.snippets %}
+                {{ s }}<br>
+              {% endfor %}
+            </p>
+          {% endif %}
+
+          <!-- Botón de enlace -->
+          {% if r.url %}
+            <a href="{{ r.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+              Ver producto
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
 </div>
 {% endblock %}

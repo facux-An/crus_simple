@@ -129,6 +129,7 @@
               <p class="card-text mb-3">
                 <span class="d-block"><strong>Email:</strong> {{ alumno.email }}</span>
                 <span class="d-block"><strong>Carrera:</strong> {{ alumno.carrera }}</span>
+                <span class="d-block"><strong>Calificación:</strong> {{ alumno.calificacion }}</span>
                 <span class="d-block text-muted"><strong>Creado:</strong> {{ alumno.creado|date:"d/m/Y H:i" }}</span>
               </p>
               <div class="d-flex flex-wrap gap-2">
@@ -165,6 +166,7 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Carrera</th>
+                <th>Calificación</th>
                 <th>Creado</th>
                 <th class="text-end">Acciones</th>
               </tr>
@@ -175,6 +177,7 @@
                   <td class="fw-semibold">{{ alumno.nombre }}</td>
                   <td>{{ alumno.email }}</td>
                   <td><span class="badge bg-primary-subtle text-primary border">{{ alumno.carrera }}</span></td>
+                  <td>{{ alumno.calificacion }}</td>
                   <td class="text-muted">{{ alumno.creado|date:"d/m/Y H:i" }}</td>
                   <td class="text-end">
                     <div class="btn-group">

@@ -1,6 +1,5 @@
 from django.urls import path
-from .views import buscar
-from .views import buscar, home_scraper
+from .views import home_scraper, buscar
 
 urlpatterns = [
     path("", home_scraper, name="scraper_home"),
