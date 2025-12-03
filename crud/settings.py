@@ -9,9 +9,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "inseguro-en-local")
 # Para desarrollo puedes dejar DEBUG=True en tu entorno local, en producción obligatoriamente DEBUG=False
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-# ALLOWED_HOSTS: si pones "*" en la variable de entorno se mantendrá el wildcard,
-# si no se toman los hosts de la variable ALLOWED_HOSTS separada por comas,
-# o por defecto localhost y 127.0.0.1 para desarrollo.
+# ALLOWED_HOSTS
 _raw_allowed = os.environ.get("ALLOWED_HOSTS", None)
 if _raw_allowed:
     if _raw_allowed.strip() == "*":
@@ -68,8 +66,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "crud.wsgi.application"
 
 # DATABASES
-# - Por defecto usa sqlite para desarrollo
-# - Si existe DATABASE_URL en el entorno, dj_database_url la usará (ideal para Render/Heroku)
 DATABASE_URL = os.environ.get("DATABASE_URL", None)
 if DATABASE_URL:
     DATABASES = {
@@ -107,27 +103,54 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "login"
 
-# EMAIL
-# - Por defecto, en desarrollo usamos el backend de consola (no enviar correos reales).
-# - En producción, pon EMAIL_HOST en las environment variables para activar SMTP.
-if os.environ.get("EMAIL_HOST"):
+# ---------------------------------------------------------------------
+# EMAIL (Mailgun via Anymail preferred) - fallback a SMTP si se configura
+# ---------------------------------------------------------------------
+# Prioridad:
+# 1) Si MAILGUN_API_KEY y MAILGUN_DOMAIN están definidos -> usar Anymail + Mailgun (API)
+# 2) elif EMAIL_HOST está definido -> usar SMTP (como antes)
+# 3) else -> backend de consola (desarrollo)
+
+MAILGUN_API_KEY = os.environ.get("MAILGUN_API_KEY")
+MAILGUN_DOMAIN = os.environ.get("MAILGUN_DOMAIN")
+# DEFAULT_FROM_EMAIL puede venir del entorno; si no, se construye más abajo según el backend seleccionado.
+DEFAULT_FROM_EMAIL_ENV = os.environ.get("DEFAULT_FROM_EMAIL")
+
+# Si está configurado Mailgun (API) lo utilizamos
+if MAILGUN_API_KEY and MAILGUN_DOMAIN:
+    # Asegúrate de añadir 'anymail' a requirements.txt (pip install anymail)
+    if "anymail" not in INSTALLED_APPS:
+        INSTALLED_APPS.append("anymail")
+
+    EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+    ANYMAIL = {
+        "MAILGUN_API_KEY": MAILGUN_API_KEY,
+        # opcionalmente: "MAILGUN_API_URL": os.environ.get("MAILGUN_API_URL", "https://api.mailgun.net/v3"),
+        # y también "MAILGUN_SENDER_DOMAIN" = MAILGUN_DOMAIN si lo necesitas explícitamente
+        "MAILGUN_SENDER_DOMAIN": MAILGUN_DOMAIN,
+    }
+    DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL_ENV or f"postmaster@{MAILGUN_DOMAIN}"
+
+# Si no hay Mailgun definido, permitimos SMTP si se definieron variables
+elif os.environ.get("EMAIL_HOST"):
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ.get("EMAIL_HOST")
     EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
     EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+    EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "False") == "True"
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-    # Si usas otros proveedores (SSL) ajusta EMAIL_USE_SSL/ports según corresponda.
+    DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL_ENV or EMAIL_HOST_USER or "no-reply@example.com"
+    # Nota: si usas Gmail y Render no permite SMTP, es preferible pasar a Mailgun/SendGrid.
 else:
+    # Desarrollo / fallback: backend de consola
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@example.com")
+    DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL_ENV or "no-reply@example.com"
 
 # Mensajes
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 # Seguridad adicional para despliegues detrás de un proxy (ej. Render)
-# Asegúrate de habilitar esto si tu plataforma setea X-Forwarded-Proto
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Opcional: ajustes de seguridad que conviene activar en producción
@@ -141,7 +164,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get("SECURE_HSTS_INCLUDE_SUBDOMAINS", "True") == "True"
     SECURE_HSTS_PRELOAD = os.environ.get("SECURE_HSTS_PRELOAD", "False") == "True"
 
-# Logging básico (puedes ampliarlo según necesidades)
+# Logging básico
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
