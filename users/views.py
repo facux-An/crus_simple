@@ -5,7 +5,8 @@ from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
 from django import forms
 from django.conf import settings
-from smtplib import SMTPException
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -37,13 +38,13 @@ def register(request):
             user.set_password(form.cleaned_data["password"])
             user.save()
 
-            # Enviar correo de bienvenida (manejo de errores)
+            # Enviar correo de bienvenida
             subject = "Bienvenido al sistema de Alumnos"
             message = f"Hola {user.username}, tu registro fue exitoso. ¡Bienvenido!"
-            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+            from_email = settings.DEFAULT_FROM_EMAIL
+            mail_sent = False
 
             try:
-                
                 send_mail(
                     subject=subject,
                     message=message,
@@ -52,13 +53,13 @@ def register(request):
                     fail_silently=False,
                 )
                 mail_sent = True
-            except (BadHeaderError, SMTPException, Exception) as e:
-                # No queremos bloquear el registro por un fallo en el envío de correo.
-                mail_sent = False
-                # Guardar info en mensajes para que el usuario lo sepa
+            except BadHeaderError:
+                messages.error(request, "Encabezado inválido en el correo.")
+            except Exception as e:
+                # Capturamos cualquier error de envío
                 messages.warning(
                     request,
-                    "Se registró correctamente, pero no se pudo enviar el correo de bienvenida (error de envío)."
+                    "Se registró correctamente, pero no se pudo enviar el correo de bienvenida."
                 )
 
             # Autenticar y loguear al usuario
@@ -70,12 +71,27 @@ def register(request):
                         request,
                         f"📨 Bienvenido {user.username}, se envió un correo de bienvenida a {user.email} ✅"
                     )
-                else:
-                    # Warning ya agregado arriba en excepción; aquí podemos agregar info adicional opcional.
-                    pass
 
             return redirect("dashboard")
     else:
         form = RegisterForm()
 
     return render(request, "users/register.html", {"form": form})
+@staff_member_required  # solo accesible para usuarios staff/superusuario
+def test_email(request):
+    subject = "Prueba de Mailgun"
+    message = "Este es un correo de prueba enviado desde Django usando Mailgun."
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient = "tucorreo@ejemplo.com"  # cámbialo por tu email real
+
+    try:
+        send_mail(
+            subject,
+            message,
+            from_email,
+            [recipient],
+            fail_silently=False,
+        )
+        return HttpResponse(f"✅ Correo de prueba enviado a {recipient}")
+    except Exception as e:
+        return HttpResponse(f"❌ Error al enviar correo: {e}")
