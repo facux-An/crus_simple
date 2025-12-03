@@ -14,17 +14,18 @@ def buscar(request):
 
     if query:
         try:
-            # Ejemplo: scraping en Wikipedia
             url = f"https://es.wikipedia.org/wiki/{query}"
-            response = requests.get(url, timeout=5)
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                              "AppleWebKit/537.36 (KHTML, like Gecko) "
+                              "Chrome/120.0.0.0 Safari/537.36"
+            }
+            response = requests.get(url, headers=headers, timeout=5)
 
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")
 
-                # Título de la página
                 titulo = soup.find("h1").get_text(strip=True)
-
-                # Snippets: párrafos iniciales
                 parrafos = soup.select("p")
                 snippets = [p.get_text(strip=True) for p in parrafos[:3]]
 
